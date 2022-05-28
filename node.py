@@ -1,9 +1,8 @@
 import array
-from pickle import NONE
 
 class Node:
 
-    def __init__(self, coordinates : tuple, neighbours : array = [NONE]):
+    def __init__(self, coordinates : tuple, neighbours : array = [None]):
         
         self.position_x = coordinates[0]
         self.position_y = coordinates[1]
@@ -13,3 +12,6 @@ class Node:
 
     def add_neighbour(self, node):
         self.neighbours.append(node)
+
+    def get_tuple(self):
+        return (self.position_x, self.position_y, self.position_z)
