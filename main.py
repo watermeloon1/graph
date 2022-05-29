@@ -24,6 +24,7 @@ def main():
     #pressed = False
     previous_click = None
     exit = False
+    stop = False
     while not exit:
 
         for event in pygame.event.get():
@@ -35,16 +36,19 @@ def main():
                 previous_click = pygame.mouse.get_pos()
 
             if pygame.mouse.get_pressed()[0] and previous_click != None:
-                pygame.draw.rect(screen, (255, 255, 255), (0, 0, WINDOW_WIDTH, WINDOW_HEIGHT))
-                g.rotate_3D(previous_click, pygame.mouse.get_pos(), screen, WINDOW_WIDTH, WINDOW_HEIGHT)
+                #pygame.draw.rect(screen, (255, 255, 255), (0, 0, WINDOW_WIDTH, WINDOW_HEIGHT))
+                #g.rotate_3D(previous_click, pygame.mouse.get_pos(), screen, WINDOW_WIDTH, WINDOW_HEIGHT)
                 previous_click = pygame.mouse.get_pos()
-            
+                stop = not stop
+
             if not pygame.mouse.get_pressed()[0] and previous_click != None:
                 previous_click = None
 
-        #pygame.draw.rect(screen, (255, 255, 255), (0, 0, WINDOW_WIDTH, WINDOW_HEIGHT))
-        #g.rotate_3D(screen, WINDOW_WIDTH, WINDOW_HEIGHT)
-                
+        if not stop:
+            pygame.draw.rect(screen, (255, 255, 255), (0, 0, WINDOW_WIDTH, WINDOW_HEIGHT))
+            g.rotate_3D((0,0,0), (0,0,0), screen, WINDOW_WIDTH, WINDOW_HEIGHT)       
+            print("X: " + str(g.nodes[11].position_x) + " Y: " + str(g.nodes[11].position_y) + " Z: " + str(g.nodes[11].position_z) + " R: " + str(graph.distance_3D(g.nodes[11].get_tuple(), graph.ORIGO)) + " O: " + str(g.radius_11) + " " + str(graph.on_sphere(g.nodes[11].get_tuple(), g.radius_11)))
+    
         pygame.display.update()
 
     pygame.quit()
