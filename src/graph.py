@@ -1,10 +1,10 @@
-from math import sqrt, sin, cos, isclose, pi, acos
+from math import sqrt, sin, cos, pi, acos, atan
 import string
 import node
 import random
 import pygame
 
-RADIUS = 250
+RADIUS = 300
 ORIGO = (0, 0, 0)
 
 def random_coordinate_C():    
@@ -17,8 +17,8 @@ def random_coordinate_C():
     return (x, y, z)
 
 def random_coordinate_S():
-    u = random.random()
     v = random.random()
+    u = random.random()
     r = random.random() ** (1./3.)
 
     theta = u * 2.0 * pi
@@ -41,15 +41,6 @@ def distance_3D(node1 : tuple , node2 : tuple):
     
     return sqrt(x + y + z)
 
-def distance_2D(node1 : tuple, node2 : tuple):
-    x = pow(node1[0] - node2[0], 2)
-    y = pow(node1[1] - node2[1], 2)
-    
-    return sqrt(x + y)
-
-def on_sphere(coordinates : tuple, radius : float):
-    return isclose(pow((coordinates[0] - ORIGO[0]), 2) + pow((coordinates[1] - ORIGO[1]), 2) + pow((coordinates[2] - ORIGO[2]), 2), pow(radius, 2))
-
 class Graph:
     def __init__(self, shape : string, number : int):
 
@@ -67,8 +58,6 @@ class Graph:
             for i in range(number):
                 coordinate = random_coordinate_C()
                 self.nodes.append(node.Node(coordinate))
-
-        self.radius_11 = distance_3D(ORIGO, self.nodes[11].get_tuple())
     
     def check_coordinates(self):
         for i in self.nodes:
@@ -84,24 +73,31 @@ class Graph:
         
         return distance_3D(node1, node2)
 
-    def draw(self, screen : pygame.Surface, WINDOW_WIDTH : int, WINDOW_HEIGHT : int):
+    def draw(self, screen : pygame.Surface, camera : tuple, WINDOW_WIDTH : int, WINDOW_HEIGHT : int):
+
+        zoom = RADIUS / camera.position_z
 
         for i in self.nodes: 
 
-            if i.position_z < 0:
-                alpha = (RADIUS - (abs(i.position_z) / 2)) / RADIUS
-            elif i.position_z > 0:
-                alpha = (RADIUS + (abs(i.position_z) / 2)) / RADIUS
-            else: alpha = 1
+            #negativ nem lehet
+            draw_x = (WINDOW_WIDTH / 2) + (i.position_x * zoom)
+            draw_y = (WINDOW_HEIGHT / 2) + (i.position_y * zoom)
 
-            RGB = (255 - (alpha * (255 / 2)), 255 - (alpha * (255 / 2)), 255 - (alpha * (255 / 2)))
+            if 0 < draw_x <= WINDOW_WIDTH and 0 < draw_y <= WINDOW_HEIGHT:
 
-            if i == self.nodes[11] or i == self.nodes[12]:
-                pygame.draw.circle(screen, (255,0,0), ((WINDOW_WIDTH / 2 + i.position_x) , (WINDOW_HEIGHT / 2 + i.position_y)), 2 * alpha)
-                continue
+                if i.position_z < 0:
+                    alpha = (RADIUS - (abs(i.position_z) / 2)) / RADIUS
+                elif i.position_z > 0:
+                    alpha = (RADIUS + (abs(i.position_z) / 2)) / RADIUS
+                else: alpha = 1
 
-            if not pygame.draw.circle(screen, RGB , ((WINDOW_WIDTH / 2 + i.position_x) , (WINDOW_HEIGHT / 2 + i.position_y)), 2 * alpha):
-                print("ERROR: could not draw node " + str(i) + "!")
+                RGB = (255 - (alpha * (255 / 2)), 255 - (alpha * (255 / 2)), 255 - (alpha * (255 / 2)))
+                
+                if not pygame.draw.circle(screen, RGB , (draw_x , draw_y), 2 * alpha):
+                    print("ERROR: could not draw node " + str(i) + "!")
+
+                if i.position_x == 0 and i.position_y == 0 and i.position_z == 0:
+                    pygame.draw.circle(screen, (255, 0, 0) , (draw_x , draw_y), 2)
             
         #TRACE
         #print("X1: " + str(self.nodes[0].position_x) + " Y1: " + str(self.nodes[0].position_y) + " X2: " + str(self.nodes[1].position_x) + str(" Y2: " + str(self.nodes[1].position_y)))
@@ -167,7 +163,7 @@ class Graph:
             return
         
         if param_type == "th":
-            speed = 0.01
+            speed = 0.008
         else: speed = 1
         
         mouse_x = speed * ((WINDOW_WIDTH - previous_click[1]) - (WINDOW_WIDTH - click[1]))
