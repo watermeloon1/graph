@@ -6,7 +6,7 @@ A visual program with graph utilities, that can be used in any python project, t
 
 ---
 
-##Running
+## Running
 
 Add execute permission to the [makefile](build.sh) file with:
 ```
