@@ -1,6 +1,4 @@
-import pygame
-import graph
-import camera
+import pygame, graph, camera
 
 class Application:
     
@@ -9,12 +7,14 @@ class Application:
 
         self.WINDOW_WIDTH = 720
         self.WINDOW_HEIGHT = 720
+
         self.fps = 60
 
         self.resolution =(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.screen = pygame.display.set_mode(self.resolution)
         self.exit = False
         self.previous_click = None
+        self.auto_rotate = False
 
         self.graph = graph
         self.camera = camera.Camera((0, 0, 300))
@@ -30,8 +30,13 @@ class Application:
             for event in pygame.event.get():
                 self.check_event(event)
 
-            pygame.draw.rect(self.screen, (255, 255, 255), (0, 0, self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
+            self.screen.fill((255, 255, 255))
+            
+            if self.auto_rotate:
+                self.graph.rotate_3DA(0.8, "cl")
+
             self.graph.draw(self.screen, self.camera, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+            
             pygame.display.update()
             self.clock.tick(self.fps)
 
@@ -46,6 +51,11 @@ class Application:
 
         if pygame.key.get_pressed()[pygame.K_PERIOD]:
             self.camera.zoom(+5)
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a:
+                print("Key A has been pressed")
+                self.auto_rotate = not self.auto_rotate
 
         if pygame.mouse.get_pressed()[0] and self.previous_click == None:
             self.previous_click = pygame.mouse.get_pos()

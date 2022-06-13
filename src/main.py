@@ -1,15 +1,11 @@
-import graph
-import application
-import node
+import application, node, globe, sphere, cube
 
 def main():
 
-    gr = graph.Graph("sphere", 3000)
+    origo = (400, 0, 0)
+    graph = globe.Globe(origo, 500, 250)
 
-    origo = node.Node((0, 0, 0))
-    gr.add_node(origo)
-
-    app = application.Application(gr)
+    app = application.Application(graph)
     app.animate()
     
 if __name__ == "__main__":

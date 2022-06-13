@@ -1,38 +1,5 @@
-from math import sqrt, sin, cos, pi, acos, atan
-import string
-import node
-import random
-import pygame
-
-RADIUS = 300
-ORIGO = (0, 0, 0)
-
-def random_coordinate_C():    
-    size = round((2 * RADIUS) / (sqrt(3) * 2), 0)
-
-    x = random.randrange(-size, size)
-    y = random.randrange(-size, size)
-    z = random.randrange(-size, size)
-
-    return (x, y, z)
-
-def random_coordinate_S():
-    v = random.random()
-    u = random.random()
-    r = random.random() ** (1./3.)
-
-    theta = u * 2.0 * pi
-    phi = acos(2.0 * v - 1.0)
-    sin_theta = sin(theta)
-    cos_theta = cos(theta)
-    sin_phi = sin(phi)
-    cos_phi = cos(phi)
-
-    x = r * sin_phi * cos_theta * RADIUS
-    y = r * sin_phi * sin_theta * RADIUS
-    z = r * cos_phi * RADIUS
-
-    return (x, y, z)
+import string, node, pygame, array
+from math import sqrt, sin, cos
 
 def distance_3D(node1 : tuple , node2 : tuple):       
     x = pow(node1[0] - node2[0], 2)
@@ -42,26 +9,15 @@ def distance_3D(node1 : tuple , node2 : tuple):
     return sqrt(x + y + z)
 
 class Graph:
-    def __init__(self, shape : string, number : int):
-
-        self.nodes = []
+    def __init__(self, origo: tuple, radius: int):
         
-        if not (shape == "sphere" or shape == "cube"):
-            print("ERROR: invalid string argument for graph type!")
-            return
+        self.nodes: array = []
+        self.origo = origo
+        self.radius: int = radius
 
-        if shape == "sphere":
-            for i in range(number):
-                coordinate = random_coordinate_S()
-                self.nodes.append(node.Node(coordinate))
-        else:
-            for i in range(number):
-                coordinate = random_coordinate_C()
-                self.nodes.append(node.Node(coordinate))
-    
     def check_coordinates(self):
         for i in self.nodes:
-            if not -RADIUS < i.position_x < RADIUS or not -RADIUS < i.position_y < RADIUS or not -RADIUS < i.position_z < RADIUS:
+            if not -self.radius < i.position_x < self.radius or not -self.radius < i.position_y < self.radius or not -self.radius < i.position_z < self.radius:
                 print("ERROR: failed to initalise points!")
 
     def add_node(self, node : node.Node):
@@ -75,20 +31,23 @@ class Graph:
 
     def draw(self, screen : pygame.Surface, camera : tuple, WINDOW_WIDTH : int, WINDOW_HEIGHT : int):
 
-        zoom = RADIUS / camera.position_z
+        zoom = self.radius / camera.position_z
 
-        for i in self.nodes: 
+        for i in self.nodes:
 
-            #negativ nem lehet
-            draw_x = (WINDOW_WIDTH / 2) + (i.position_x * zoom)
-            draw_y = (WINDOW_HEIGHT / 2) + (i.position_y * zoom)
+            draw_x = (WINDOW_WIDTH / 2 + self.origo[0]) + (i.position_x * zoom)
+            draw_y = (WINDOW_HEIGHT / 2 - self.origo[1]) + (i.position_y * zoom)
 
             if 0 < draw_x <= WINDOW_WIDTH and 0 < draw_y <= WINDOW_HEIGHT:
+                
+                #relative_position_z = i.position_z + self.origo[2]
 
-                if i.position_z < 0:
-                    alpha = (RADIUS - (abs(i.position_z) / 2)) / RADIUS
-                elif i.position_z > 0:
-                    alpha = (RADIUS + (abs(i.position_z) / 2)) / RADIUS
+                #TODO: viewdistance
+
+                if i.position_z < self.origo[2]:
+                    alpha = (self.radius - (abs(i.position_z) / 2)) / self.radius
+                elif i.position_z > self.origo[2]:
+                    alpha = (self.radius + (abs(i.position_z) / 2)) / self.radius
                 else: alpha = 1
 
                 RGB = (255 - (alpha * (255 / 2)), 255 - (alpha * (255 / 2)), 255 - (alpha * (255 / 2)))
@@ -105,12 +64,17 @@ class Graph:
         #EDGE
         #pygame.draw.line(screen, (200,200,200) , (WINDOW_WIDTH / 2 + self.nodes[0].position_x, WINDOW_HEIGHT / 2 + self.nodes[0].position_y), (WINDOW_WIDTH / 2 +self.nodes[1].position_x, WINDOW_HEIGHT / 2 +self.nodes[1].position_y) )
 
+    def safe_theta(self, param : float, coordinate : tuple):
+        if self.origo == coordinate:
+            return 0
+        else: return param / distance_3D(self.origo, coordinate)
+
     def rotate_X(self, param : float, type : string):
 
         for i in self.nodes:
             
             if type == "cl":
-                theta = param / distance_3D(ORIGO, i.get_tuple())
+                theta = self.safe_theta(param, i.get_tuple())
             else: theta = param
 
             sin_theta = sin(theta)
@@ -127,7 +91,7 @@ class Graph:
         for i in self.nodes:
 
             if type == "cl":
-                theta = param / distance_3D(ORIGO, i.get_tuple())
+                theta = self.safe_theta(param, i.get_tuple())
             else: theta = param
 
             sin_theta = sin(theta)
@@ -144,7 +108,7 @@ class Graph:
         for i in self.nodes:
             
             if type == "cl":
-                theta = param / distance_3D(ORIGO, i.get_tuple())
+                theta = self.safe_theta(param, i.get_tuple())
             else: theta = param
 
             sin_theta = sin(theta)
@@ -172,7 +136,7 @@ class Graph:
         self.rotate_X(mouse_x, param_type)
         self.rotate_Y(mouse_y, param_type)
 
-    def rotate_3DA(self, param : tuple, param_type : string):
+    def rotate_3DA(self, param : float, param_type : string):
 
         if not (param_type == "cl" or param_type == "th"):
             print("ERROR: invalid arguments for rotation!")

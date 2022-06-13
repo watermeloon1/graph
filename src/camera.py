@@ -6,5 +6,6 @@ class Camera:
         self.position_z = coordinates[2]
 
     def zoom(self, param : int):
-        if not (self.position_z + param) <= 0:
+        if 70 < (self.position_z + param) < 600:
             self.position_z += param
+            print(self.position_z)
