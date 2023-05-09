@@ -20,12 +20,6 @@ than just run the file with:
 
 ---
 
-## Contributors
-
-- Ifkovics Barnabás
-
----
-
 ## License
 
 Licensed under the [MIT License](LICENSE)
