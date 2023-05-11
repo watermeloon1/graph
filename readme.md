@@ -1,4 +1,4 @@
-## Graph visualizer in python
+# Graph visualizer in python
 
 The project is a Python-based visualization tool that allows users to generate and rotate 3D graphs.
 
