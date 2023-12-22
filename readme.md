@@ -1,10 +1,10 @@
 # Graph visualizer in python
 
-The project is a Python-based visualization tool that allows users to generate and rotate 3D graphs.
+The project is a Python-based visualization tool that allows users to generate and rotate 3D graphs. It is written in object-oriented Python, which no one should ever do...really.
 
 ## Installation
 
-To run the project, you need to have Python and Pygame installed on your machine. To install Pygame, run the following command:
+To run the project, you must install Python and Pygame on your machine. To install Pygame, run the following command:
 ```shell
 pip install pygame
 ```
@@ -15,7 +15,7 @@ To run the program, execute the following command in your terminal:
 ```shell
 python main.py
 ```
-The program will open a window that displays a 3D graph. You can rotate the graph in any direction by clicking and dragging with your mouse.
+The program will open a window that displays a 3D graph. You can rotate the graph by clicking and dragging with your mouse.
 
 ## Development
 
